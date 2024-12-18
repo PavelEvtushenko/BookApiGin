@@ -2,6 +2,7 @@ package models
 
 import (
 	"BookApiGin/pcg/config"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -46,4 +47,33 @@ func GetAllBooks() []Book {
 func (b *Book) CreateBook() *Book {
 	config.GetDb().Create(&b)
 	return b
+}
+
+func GetBookById(Id int64) (*Book, *gorm.DB) {
+	var getBook Book
+	db := db.Where("ID=?", Id).Find(&getBook)
+	return &getBook, db
+}
+
+func DeleteBook(ID int64) error {
+	var book Book
+	result := db.Where("ID=?", ID).Delete(&book)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no rows affected")
+	}
+	return nil
+}
+
+func UpdateBook(ID int64, book *Book) error {
+	result := db.Where("ID=?", ID).Updates(book)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no rows affected")
+	}
+	return nil
 }
